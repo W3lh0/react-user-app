@@ -9,6 +9,7 @@ const Backdrop = (props) => {
 };
 
 const ModalOverlay = (props) => {
+  console.log('errorType:', props.errorType);
   return (
     <Card className={classes.modal}>
       <header className={classes.header}>
@@ -19,6 +20,9 @@ const ModalOverlay = (props) => {
       </div>
       <footer className={classes.actions}>
         <Button onClick={props.onConfirm}>Okay</Button>
+        {props.errorType === 'passwordInvalid' && (
+          <Button onClick={props.onGeneratePassword}>Generate Password</Button>
+        )}
       </footer>
     </Card>
   );
@@ -36,6 +40,8 @@ const ErrorModal = (props) => {
           title={props.title}
           message={props.message}
           onConfirm={props.onConfirm}
+          onGeneratePassword={props.onGeneratePassword}
+          errorType={props.errorType}
         />,
         document.getElementById('overlay-root')
       )}

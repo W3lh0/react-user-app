@@ -9,22 +9,39 @@ const AddUser = (props) => {
   
   const nameInputRef = useRef();
   const ageInputRef = useRef();
+  const passwordInputRef = useRef();
 
-  //const [enteredUsername, setEnteredUsername] = useState('');
-  //const [enteredAge, setEnteredAge] = useState('');
   const [error, setError] = useState();
 
+  const generateRandomPassword = () => {
+    let generatedPassword = '';
+      const passwordCharactes = "aBCdEfGhIjKlMnOpQr123456789";
+      const max = passwordCharactes.length;
+
+      for (let i = 0; i < 12; i++) {
+        let randomInt = Math.floor(Math.random() * max);
+        generatedPassword += passwordCharactes.charAt(randomInt);
+      }
+      passwordInputRef.current.value = generatedPassword;
+  };
+
+  const handleGeneratePassword = () => {
+    generateRandomPassword();
+    setError(null);
+  }
+  
   const addUserHandler = (event) => {
     event.preventDefault();
-    console.log(nameInputRef);
 
     const enteredUsername = nameInputRef.current.value;
     const enteredAge = ageInputRef.current.value;
+    const enteredPassword = passwordInputRef.current.value;
 
     if (enteredUsername.trim().length === 0 || enteredAge.trim().length === 0) {
       setError({
         title: 'Invalid input',
-        message: 'Please enter a valid name and age (non-empty values).',
+        message: 'Please enter a valid name, age and password (non-empty values).',
+        type: 'nameOrAge'
       });
       return;
     }
@@ -32,23 +49,25 @@ const AddUser = (props) => {
       setError({
         title: 'Invalid age',
         message: 'Please enter a valid age (> 0).',
+        type: 'age'
       });
       return;
     }
-    props.onAddUser(enteredUsername, enteredAge);
+    if (enteredPassword.trim().length < 12) {
+      setError({
+        title: 'Invalid Password',
+        message: 'Please enter a valid password (atleast twelve characters long)',
+        type: 'passwordInvalid'
+      });
+      
+      return;
+    }
+
+    props.onAddUser(enteredUsername, enteredAge, enteredPassword);
     nameInputRef.current.value = '';
     ageInputRef.current.value = '';
-    //setEnteredUsername('');
-    //setEnteredAge('');
+    passwordInputRef.current.value = '';
   };
-
-  /* const usernameChangeHandler = (event) => {
-    setEnteredUsername(event.target.value);
-  }; */
-
-  /* const ageChangeHandler = (event) => {
-    setEnteredAge(event.target.value);
-  }; */
 
   const errorHandler = () => {
     setError(null);
@@ -61,6 +80,8 @@ const AddUser = (props) => {
           title={error.title}
           message={error.message}
           onConfirm={errorHandler}
+          onGeneratePassword={handleGeneratePassword}
+          errorType={error.type}
         />
       )}
       <Card className={classes.input}>
@@ -80,6 +101,12 @@ const AddUser = (props) => {
         //    value={enteredAge}
         //    onChange={ageChangeHandler}
             ref={ageInputRef}
+          />
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            type="text"
+            ref={passwordInputRef}
           />
           <Button type="submit">Add User</Button>
         </form>
